@@ -162,6 +162,7 @@ export interface CouponData {
 }
 
 export interface PaymentGatewaySettings {
+  activeGateway: "RAZORPAY" | "PHONEPE";
   currency: "INR" | "USD";
   currencySymbol: "₹" | "$";
   adminCommissionPercent: number;

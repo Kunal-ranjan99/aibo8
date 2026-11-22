@@ -20,18 +20,21 @@ export function EnrollCard({
   course,
   isEnrolled,
   isLoggedIn,
+  activeGateway = "RAZORPAY",
 }: {
   course: CourseData;
   isEnrolled: boolean;
   isLoggedIn: boolean;
+  activeGateway?: "RAZORPAY" | "PHONEPE";
 }) {
   const router = useRouter();
   const [coupon, setCoupon] = useState("");
   const [discount, setDiscount] = useState(0);
   const [couponMsg, setCouponMsg] = useState("");
-  const [gateway, setGateway] = useState<"RAZORPAY" | "PHONEPE">("RAZORPAY");
   const [loading, setLoading] = useState(false);
   const [playingIntro, setPlayingIntro] = useState(false);
+
+  const gatewayLabel = activeGateway === "PHONEPE" ? "PhonePe UPI" : "Razorpay";
 
   const basePrice = course.discountPrice ?? course.price;
   const finalPrice = course.isFree ? 0 : Math.max(0, Math.round(basePrice * (1 - discount / 100)));
@@ -67,7 +70,7 @@ export function EnrollCard({
           action: "checkout",
           itemType: "COURSE",
           itemId: course.id,
-          gateway: finalPrice === 0 ? "FREE" : gateway,
+          gateway: finalPrice === 0 ? "FREE" : activeGateway,
           couponCode: coupon,
         }),
       });
@@ -147,40 +150,7 @@ export function EnrollCard({
           </span>
         </div>
 
-        {/* Razorpay / PhonePe selector for Paid courses */}
-        {!isEnrolled && finalPrice > 0 && (
-          <div className="space-y-2">
-            <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-              Select Payment Method
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setGateway("RAZORPAY")}
-                className={`flex items-center justify-center gap-1.5 rounded-xl border py-2 text-xs font-semibold transition ${
-                  gateway === "RAZORPAY"
-                    ? "border-cyan-400 bg-cyan-500/15 text-cyan-300"
-                    : "border-white/10 bg-white/5 text-slate-300"
-                }`}
-              >
-                <CreditCard className="h-3.5 w-3.5" /> Razorpay
-              </button>
-              <button
-                type="button"
-                onClick={() => setGateway("PHONEPE")}
-                className={`flex items-center justify-center gap-1.5 rounded-xl border py-2 text-xs font-semibold transition ${
-                  gateway === "PHONEPE"
-                    ? "border-indigo-400 bg-indigo-500/15 text-indigo-300"
-                    : "border-white/10 bg-white/5 text-slate-300"
-                }`}
-              >
-                <Smartphone className="h-3.5 w-3.5" /> PhonePe UPI
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Action Button */}
+        {/* Action Button (uses single Admin-selected payment gateway) */}
         {isEnrolled ? (
           <Link
             href={`/learn/${course.slug}`}
@@ -195,11 +165,17 @@ export function EnrollCard({
             disabled={loading}
             className="btn-cyber flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold text-white disabled:opacity-60"
           >
+            {finalPrice > 0 &&
+              (activeGateway === "PHONEPE" ? (
+                <Smartphone className="h-4 w-4" />
+              ) : (
+                <CreditCard className="h-4 w-4" />
+              ))}
             {loading
               ? "Processing Payment..."
               : finalPrice === 0
               ? "Enroll Free Instantly"
-              : `Pay ₹${finalPrice} via ${gateway}`}
+              : `Pay ₹${finalPrice} via ${gatewayLabel}`}
           </button>
         )}
 

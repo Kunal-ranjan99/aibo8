@@ -59,7 +59,28 @@ export function PaymentSettingsPanel({ initial }: { initial: PaymentGatewaySetti
             </span>
           )}
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div>
+            <label className="mb-1 block text-xs font-semibold text-cyan-300">
+              Active Checkout Payment Method *
+            </label>
+            <select
+              value={settings.activeGateway}
+              onChange={(e) =>
+                setSettings((s) => ({
+                  ...s,
+                  activeGateway: e.target.value as "RAZORPAY" | "PHONEPE",
+                }))
+              }
+              className="w-full rounded-xl border border-cyan-400/50 bg-[#050814] px-3 py-2.5 text-sm font-semibold text-white"
+            >
+              <option value="RAZORPAY">Razorpay (Cards / UPI / NetBanking)</option>
+              <option value="PHONEPE">PhonePe UPI Gateway</option>
+            </select>
+            <p className="mt-1 text-[11px] text-slate-400">
+              Only this selected method is shown to students at checkout.
+            </p>
+          </div>
           <div>
             <label className="mb-1 block text-xs font-semibold text-slate-300">
               Admin Commission (%) — Instructor gets {100 - settings.adminCommissionPercent}%

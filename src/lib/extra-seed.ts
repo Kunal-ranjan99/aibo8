@@ -9,6 +9,7 @@ import {
 } from "./types";
 
 export const DEFAULT_PAYMENT_SETTINGS: PaymentGatewaySettings = {
+  activeGateway: "RAZORPAY",
   currency: "INR",
   currencySymbol: "₹",
   adminCommissionPercent: 20,

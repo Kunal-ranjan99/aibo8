@@ -12,6 +12,7 @@ export async function GET() {
   const settings = getPaymentSettings();
   return NextResponse.json({
     settings: {
+      activeGateway: settings.activeGateway,
       currency: settings.currency,
       currencySymbol: settings.currencySymbol,
       adminCommissionPercent: settings.adminCommissionPercent,

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { CheckCircle2, Package } from "lucide-react";
 import { getAllCourses } from "@/lib/store";
-import { getBundles } from "@/lib/lms-extras";
+import { getBundles, getPaymentSettings } from "@/lib/lms-extras";
 import { getSession } from "@/lib/auth";
 import { BundleCheckoutButton } from "@/components/BundleCheckoutButton";
 
@@ -10,6 +10,7 @@ export const dynamic = "force-dynamic";
 export default async function BundlesPage() {
   const [courses, user] = await Promise.all([getAllCourses(false), getSession()]);
   const bundles = getBundles();
+  const { activeGateway } = getPaymentSettings();
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 space-y-10">
@@ -83,6 +84,7 @@ export default async function BundlesPage() {
                     bundleId={b.id}
                     price={b.bundlePrice}
                     isLoggedIn={Boolean(user)}
+                    activeGateway={activeGateway}
                   />
                 </div>
               </div>

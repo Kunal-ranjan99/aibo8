@@ -10,6 +10,7 @@ import {
   Users,
 } from "lucide-react";
 import { getCourseBySlug, getUserEnrollments } from "@/lib/store";
+import { getPaymentSettings } from "@/lib/lms-extras";
 import { getSession } from "@/lib/auth";
 import { EnrollCard } from "@/components/EnrollCard";
 
@@ -27,6 +28,7 @@ export default async function CourseDetailPage({
   const user = await getSession();
   const enrollments = user ? await getUserEnrollments(user.id) : [];
   const isEnrolled = enrollments.some((e) => e.courseId === course.id);
+  const { activeGateway } = getPaymentSettings();
 
   return (
     <div className="pb-20">
@@ -89,7 +91,12 @@ export default async function CourseDetailPage({
             </div>
 
             <div className="lg:col-span-4">
-              <EnrollCard course={course} isEnrolled={isEnrolled} isLoggedIn={Boolean(user)} />
+              <EnrollCard
+                course={course}
+                isEnrolled={isEnrolled}
+                isLoggedIn={Boolean(user)}
+                activeGateway={activeGateway}
+              />
             </div>
           </div>
         </div>
