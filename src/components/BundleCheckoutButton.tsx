@@ -75,7 +75,7 @@ export function BundleCheckoutButton({
         className="btn-cyber flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-white disabled:opacity-60"
       >
         <CheckCircle2 className="h-4 w-4" />
-        {loading ? "Processing Payment..." : `Unlock Bundle ($${price}) via ${gateway}`}
+        {loading ? "Processing Payment..." : `Unlock Bundle (₹${price}) via ${gateway}`}
       </button>
     </div>
   );

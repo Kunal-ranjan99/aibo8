@@ -117,7 +117,7 @@ export function createInvoice(input: {
     totalPaid,
     adminShare,
     instructorShare,
-    currencySymbol: "$",
+    currencySymbol: settings.currencySymbol || "₹",
     createdAt: new Date().toISOString(),
   };
 

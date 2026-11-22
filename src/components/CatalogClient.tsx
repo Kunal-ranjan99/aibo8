@@ -133,8 +133,8 @@ export function CatalogClient({
           >
             <option value="popular">Popular</option>
             <option value="rating">Rating</option>
-            <option value="price-low">Low $</option>
-            <option value="price-high">High $</option>
+            <option value="price-low">Low ₹</option>
+            <option value="price-high">High ₹</option>
           </select>
         </div>
 

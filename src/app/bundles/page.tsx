@@ -74,9 +74,9 @@ export default async function BundlesPage() {
                     <span className="text-xs text-slate-400">Bundle Price</span>
                     <div className="flex items-baseline gap-2">
                       <span className="font-display text-3xl font-bold text-emerald-400">
-                        ${b.bundlePrice}
+                        ₹{b.bundlePrice}
                       </span>
-                      <span className="text-sm text-slate-500 line-through">${b.regularTotal}</span>
+                      <span className="text-sm text-slate-500 line-through">₹{b.regularTotal}</span>
                     </div>
                   </div>
                   <BundleCheckoutButton

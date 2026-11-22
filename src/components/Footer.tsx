@@ -93,8 +93,8 @@ export function Footer() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-xs text-slate-500 sm:flex-row">
-          <p>© {new Date().getFullYear()} Aibo8 Robotics & AI Academy. All rights reserved.</p>
-          <p>Built with Next.js, TypeScript, Tailwind & Prisma</p>
+          <p>© {new Date().getFullYear()} Aibo8 Robotics &amp; AI Academy. All rights reserved.</p>
+          <p>Empowering Young Innovators in AI, Robotics &amp; IoT • Made in India</p>
         </div>
       </div>
     </footer>

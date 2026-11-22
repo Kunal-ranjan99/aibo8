@@ -302,7 +302,7 @@ export function PayoutsAndSalesAdminPanel({
                   <td className="px-5 py-3.5 text-slate-300">
                     {p.method} • <span className="font-mono-code text-xs">{p.accountDetails}</span>
                   </td>
-                  <td className="px-5 py-3.5 font-bold text-emerald-400">${p.amount}</td>
+                  <td className="px-5 py-3.5 font-bold text-emerald-400">₹{p.amount}</td>
                   <td className="px-5 py-3.5">
                     <span
                       className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
@@ -367,8 +367,8 @@ export function PayoutsAndSalesAdminPanel({
                   </td>
                   <td className="px-5 py-3.5 text-xs font-bold text-slate-300">{inv.gateway}</td>
                   <td className="px-5 py-3.5 text-xs">
-                    <span className="text-emerald-400 font-bold">Admin ${inv.adminShare}</span> •{" "}
-                    <span className="text-indigo-300 font-bold">Inst ${inv.instructorShare}</span>
+                    <span className="text-emerald-400 font-bold">Admin ₹{inv.adminShare}</span> •{" "}
+                    <span className="text-indigo-300 font-bold">Inst ₹{inv.instructorShare}</span>
                   </td>
                   <td className="px-5 py-3.5 text-right">
                     <Link href={`/invoices/${inv.id}`} className="text-xs font-semibold text-cyan-400 hover:underline">
@@ -423,12 +423,12 @@ export function InstructorPayoutsPanel({
         <div className="glass-card rounded-2xl p-5">
           <div className="text-xs uppercase text-slate-400">Net Instructor Earnings</div>
           <div className="mt-2 font-display text-3xl font-bold text-emerald-400">
-            ${totalEarned.toFixed(2)}
+            ₹{totalEarned.toFixed(2)}
           </div>
         </div>
         <div className="glass-card rounded-2xl p-5">
           <div className="text-xs uppercase text-slate-400">Total Paid Out</div>
-          <div className="mt-2 font-display text-3xl font-bold text-white">${totalPaid}</div>
+          <div className="mt-2 font-display text-3xl font-bold text-white">₹{totalPaid}</div>
         </div>
         <div className="glass-card rounded-2xl p-5">
           <div className="text-xs uppercase text-slate-400">Paid Course Sales</div>
@@ -447,7 +447,7 @@ export function InstructorPayoutsPanel({
             min={10}
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            placeholder="Amount ($)"
+            placeholder="Amount (₹)"
             className="rounded-xl border border-white/10 bg-[#050814] px-3.5 py-2.5 text-sm text-white"
           />
           <select
@@ -476,7 +476,7 @@ export function InstructorPayoutsPanel({
         {payouts.map((p) => (
           <div key={p.id} className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-xs">
             <div>
-              <span className="font-bold text-white">${p.amount}</span> via {p.method} ({p.accountDetails})
+              <span className="font-bold text-white">₹{p.amount}</span> via {p.method} ({p.accountDetails})
             </div>
             <span className="font-bold text-cyan-300">{p.status}</span>
           </div>

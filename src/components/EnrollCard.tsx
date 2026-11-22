@@ -136,9 +136,9 @@ export function EnrollCard({
             <span className="font-display text-3xl font-bold text-emerald-400">Free</span>
           ) : (
             <div className="flex items-baseline gap-2">
-              <span className="font-display text-3xl font-bold text-white">${finalPrice}</span>
+              <span className="font-display text-3xl font-bold text-white">₹{finalPrice}</span>
               {(course.discountPrice || discount > 0) && (
-                <span className="text-sm text-slate-500 line-through">${course.price}</span>
+                <span className="text-sm text-slate-500 line-through">₹{course.price}</span>
               )}
             </div>
           )}
@@ -199,7 +199,7 @@ export function EnrollCard({
               ? "Processing Payment..."
               : finalPrice === 0
               ? "Enroll Free Instantly"
-              : `Pay $${finalPrice} via ${gateway}`}
+              : `Pay ₹${finalPrice} via ${gateway}`}
           </button>
         )}
 

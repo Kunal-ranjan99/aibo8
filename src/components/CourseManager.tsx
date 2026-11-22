@@ -305,9 +305,9 @@ export function CourseManager({ courses, categories, isAdmin, onCreateNew }: Pro
                           <span className="text-emerald-400">Free</span>
                         ) : (
                           <>
-                            ${course.discountPrice ?? course.price}
+                            ₹{course.discountPrice ?? course.price}
                             {course.discountPrice && (
-                              <span className="ml-1 text-slate-500 line-through">${course.price}</span>
+                              <span className="ml-1 text-slate-500 line-through">₹{course.price}</span>
                             )}
                           </>
                         )}
@@ -659,7 +659,7 @@ function CourseEditorView({
                       : "border border-white/10 bg-white/5 text-slate-300"
                   }`}
                 >
-                  Free Course ($0)
+                  Free Course (₹0)
                 </button>
                 <button
                   type="button"
@@ -678,7 +678,7 @@ function CourseEditorView({
                 <div className="grid gap-4 sm:grid-cols-2 max-w-xl">
                   <div>
                     <label className="mb-1.5 block text-xs font-semibold text-slate-300">
-                      Regular Price (USD)
+                      Regular Price (INR ₹)
                     </label>
                     <input
                       type="number"

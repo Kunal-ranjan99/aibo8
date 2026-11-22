@@ -397,8 +397,8 @@ export default async function HomePage() {
                 <div className="mt-4 flex items-baseline justify-between border-t border-white/10 pt-3">
                   <span className="text-xs text-slate-400">{b.courseIds.length} Full Courses Included</span>
                   <div className="flex items-baseline gap-2">
-                    <span className="font-display text-xl font-bold text-emerald-400">${b.bundlePrice}</span>
-                    <span className="text-xs text-slate-500 line-through">${b.regularTotal}</span>
+                    <span className="font-display text-xl font-bold text-emerald-400">₹{b.bundlePrice}</span>
+                    <span className="text-xs text-slate-500 line-through">₹{b.regularTotal}</span>
                   </div>
                 </div>
               </div>

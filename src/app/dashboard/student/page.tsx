@@ -231,7 +231,7 @@ export default async function StudentDashboardPage() {
                 <div className="min-w-0">
                   <div className="truncate font-display text-sm font-bold text-white">{c.title}</div>
                   <div className="text-xs text-cyan-300">
-                    {c.isFree ? "Free" : `$${c.discountPrice ?? c.price}`}
+                    {c.isFree ? "Free" : `₹${c.discountPrice ?? c.price}`}
                   </div>
                 </div>
               </Link>

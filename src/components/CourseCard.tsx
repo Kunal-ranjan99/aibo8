@@ -119,9 +119,9 @@ export function CourseCard({ course }: { course: CourseData }) {
               <span className="font-display text-lg font-bold text-emerald-400">Free</span>
             ) : (
               <div className="flex items-baseline gap-1.5">
-                <span className="font-display text-lg font-bold text-white">${effectivePrice}</span>
+                <span className="font-display text-lg font-bold text-white">₹{effectivePrice}</span>
                 {course.discountPrice && (
-                  <span className="text-xs text-slate-500 line-through">${course.price}</span>
+                  <span className="text-xs text-slate-500 line-through">₹{course.price}</span>
                 )}
               </div>
             )}

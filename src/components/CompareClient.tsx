@@ -85,7 +85,7 @@ export function CompareClient({ courses }: { courses: CourseData[] }) {
                   {c.isFree ? (
                     <span className="text-emerald-400">Free</span>
                   ) : (
-                    `$${c.discountPrice ?? c.price}`
+                    `₹${c.discountPrice ?? c.price}`
                   )}
                 </td>
               ))}

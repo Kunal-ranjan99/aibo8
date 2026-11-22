@@ -295,7 +295,7 @@ export function AdminPanelClient({
               <div className="glass-card rounded-2xl p-5">
                 <div className="text-xs font-semibold uppercase text-slate-400">Platform Revenue</div>
                 <div className="mt-2 font-display text-3xl font-bold text-emerald-400">
-                  ${stats.totalRevenue.toLocaleString()}
+                  ₹{stats.totalRevenue.toLocaleString("en-IN")}
                 </div>
                 <div className="mt-1 text-xs text-slate-400">Free + Paid catalog</div>
               </div>

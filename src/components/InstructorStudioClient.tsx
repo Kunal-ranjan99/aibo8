@@ -153,7 +153,7 @@ export function InstructorStudioClient({
                   <DollarSign className="h-4 w-4 text-emerald-400" />
                 </div>
                 <div className="mt-2 font-display text-3xl font-bold text-emerald-400">
-                  ${estRevenue.toLocaleString()}
+                  ₹{estRevenue.toLocaleString("en-IN")}
                 </div>
               </div>
               <div className="glass-card rounded-2xl p-5">

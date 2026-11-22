@@ -206,7 +206,7 @@ export function CreateCourseForm({ categories, onCreated }: CreateProps) {
           {!isFree && (
             <div className="grid gap-4 sm:grid-cols-2 pt-2">
               <div>
-                <label className="mb-1 block text-xs text-slate-400">Regular Price (USD)</label>
+                <label className="mb-1 block text-xs text-slate-400">Regular Price (INR ₹)</label>
                 <input
                   type="number"
                   min={1}
