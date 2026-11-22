@@ -31,6 +31,7 @@ export function EnrollCard({
   const [couponMsg, setCouponMsg] = useState("");
   const [gateway, setGateway] = useState<"RAZORPAY" | "PHONEPE">("RAZORPAY");
   const [loading, setLoading] = useState(false);
+  const [playingIntro, setPlayingIntro] = useState(false);
 
   const basePrice = course.discountPrice ?? course.price;
   const finalPrice = course.isFree ? 0 : Math.max(0, Math.round(basePrice * (1 - discount / 100)));
@@ -88,17 +89,44 @@ export function EnrollCard({
 
   return (
     <div className="glass-card sticky top-24 overflow-hidden rounded-2xl">
-      <div className="relative aspect-video overflow-hidden">
-        <img src={course.thumbnail} alt={course.title} className="h-full w-full object-cover" />
-        <div className="absolute inset-0 flex items-center justify-center bg-black/45">
-          <Link
-            href={`/learn/${course.slug}`}
-            className="flex items-center gap-2 rounded-full border border-cyan-400/50 bg-[#050814]/85 px-4 py-2 text-xs font-semibold text-cyan-200 backdrop-blur-md transition hover:scale-105 keep-white"
-          >
-            <PlayCircle className="h-4 w-4 text-cyan-400" />
-            Preview Course Studio
-          </Link>
-        </div>
+      <div className="relative aspect-video overflow-hidden bg-black">
+        {playingIntro && course.introVideoUrl ? (
+          course.introVideoUrl.endsWith(".mp4") || course.introVideoUrl.endsWith(".webm") ? (
+            <video src={course.introVideoUrl} controls autoPlay className="h-full w-full object-cover" />
+          ) : (
+            <iframe
+              src={course.introVideoUrl}
+              title={`${course.title} Intro Video`}
+              className="h-full w-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          )
+        ) : (
+          <>
+            <img src={course.thumbnail} alt={course.title} className="h-full w-full object-cover" />
+            <div className="absolute inset-0 flex items-center justify-center bg-black/45">
+              {course.introVideoUrl ? (
+                <button
+                  type="button"
+                  onClick={() => setPlayingIntro(true)}
+                  className="flex items-center gap-2 rounded-full border border-cyan-400/50 bg-[#050814]/85 px-4 py-2 text-xs font-semibold text-cyan-200 backdrop-blur-md transition hover:scale-105 keep-white"
+                >
+                  <PlayCircle className="h-4 w-4 text-cyan-400" />
+                  Watch Course Intro Video
+                </button>
+              ) : (
+                <Link
+                  href={`/learn/${course.slug}`}
+                  className="flex items-center gap-2 rounded-full border border-cyan-400/50 bg-[#050814]/85 px-4 py-2 text-xs font-semibold text-cyan-200 backdrop-blur-md transition hover:scale-105 keep-white"
+                >
+                  <PlayCircle className="h-4 w-4 text-cyan-400" />
+                  Preview Course Studio
+                </Link>
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       <div className="p-6 space-y-5">

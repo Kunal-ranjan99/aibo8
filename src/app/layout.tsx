@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { NavigationProgress } from "@/components/NavigationProgress";
 import { getSession } from "@/lib/auth";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -25,6 +27,9 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} dark`}>
       <body className="min-h-screen flex flex-col bg-[#050814] text-slate-100 antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
         <Navbar user={user} />
         <main className="flex-1">{children}</main>
         <Footer />

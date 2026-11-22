@@ -13,6 +13,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { CategoryData, CourseData, LessonType, QuizQuestion } from "@/lib/types";
+import { MediaUploadFields } from "./MediaUploadFields";
 
 interface CreateProps {
   categories: CategoryData[];
@@ -25,6 +26,8 @@ export function CreateCourseForm({ categories, onCreated }: CreateProps) {
   const [successMsg, setSuccessMsg] = useState("");
   const [title, setTitle] = useState("");
   const [shortDescription, setShortDescription] = useState("");
+  const [thumbnail, setThumbnail] = useState("");
+  const [introVideoUrl, setIntroVideoUrl] = useState("");
   const [categorySlug, setCategorySlug] = useState(categories[0]?.slug || "robotics");
   const firstSubs = categories.find((c) => c.slug === categorySlug)?.subCategories || [];
   const [subCategorySlug, setSubCategorySlug] = useState(firstSubs[0]?.slug || "");
@@ -52,6 +55,8 @@ export function CreateCourseForm({ categories, onCreated }: CreateProps) {
           title,
           shortDescription,
           description: shortDescription,
+          thumbnail: thumbnail || undefined,
+          introVideoUrl: introVideoUrl || null,
           categorySlug,
           subCategorySlug: subCategorySlug || subCategories[0]?.slug,
           level,
@@ -67,6 +72,8 @@ export function CreateCourseForm({ categories, onCreated }: CreateProps) {
       if (res.ok) {
         setTitle("");
         setShortDescription("");
+        setThumbnail("");
+        setIntroVideoUrl("");
         setDiscountPrice("");
         setLessonVideoUrl("");
         setSuccessMsg("Course created & sent to Pending Admin Approval queue!");
@@ -117,6 +124,13 @@ export function CreateCourseForm({ categories, onCreated }: CreateProps) {
             className="w-full rounded-xl border border-white/10 bg-[#050814] px-4 py-2.5 text-sm text-white focus:border-cyan-400/60 focus:outline-none"
           />
         </div>
+
+        <MediaUploadFields
+          thumbnail={thumbnail}
+          onThumbnailChange={setThumbnail}
+          introVideoUrl={introVideoUrl}
+          onIntroVideoChange={setIntroVideoUrl}
+        />
 
         <div>
           <label className="mb-1.5 block text-xs font-semibold text-slate-300">Category *</label>

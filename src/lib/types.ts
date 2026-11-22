@@ -69,6 +69,7 @@ export interface CourseData {
   shortDescription: string;
   description: string;
   thumbnail: string;
+  introVideoUrl?: string | null;
   level: "Beginner" | "Intermediate" | "Advanced" | string;
   ageGroup?: AgeGroup;
   price: number;

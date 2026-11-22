@@ -402,6 +402,8 @@ export async function createCourseInStore(input: {
   title: string;
   shortDescription: string;
   description: string;
+  thumbnail?: string;
+  introVideoUrl?: string | null;
   categorySlug: string;
   subCategorySlug?: string;
   level: string;
@@ -435,7 +437,8 @@ export async function createCourseInStore(input: {
     slug,
     shortDescription: input.shortDescription,
     description: input.description,
-    thumbnail: cat.image,
+    thumbnail: input.thumbnail?.trim() || cat.image,
+    introVideoUrl: input.introVideoUrl?.trim() || null,
     level: input.level,
     price: isFree ? 0 : input.price,
     discountPrice: isFree ? null : input.discountPrice || null,
@@ -530,6 +533,8 @@ export async function updateCourseInStore(
     title?: string;
     shortDescription?: string;
     description?: string;
+    thumbnail?: string;
+    introVideoUrl?: string | null;
     categorySlug?: string;
     subCategorySlug?: string;
     level?: string;
@@ -550,6 +555,8 @@ export async function updateCourseInStore(
   if (updates.title !== undefined) course.title = updates.title.trim();
   if (updates.shortDescription !== undefined) course.shortDescription = updates.shortDescription.trim();
   if (updates.description !== undefined) course.description = updates.description.trim();
+  if (updates.thumbnail !== undefined && updates.thumbnail.trim()) course.thumbnail = updates.thumbnail.trim();
+  if (updates.introVideoUrl !== undefined) course.introVideoUrl = updates.introVideoUrl?.trim() || null;
   if (updates.level !== undefined) course.level = updates.level;
   if (updates.duration !== undefined) course.duration = updates.duration;
   if (updates.hardwareTags !== undefined) course.hardwareTags = updates.hardwareTags;
@@ -562,7 +569,9 @@ export async function updateCourseInStore(
     if (cat) {
       course.categorySlug = cat.slug;
       course.categoryName = cat.name;
-      course.thumbnail = cat.image;
+      if (!updates.thumbnail && !course.thumbnail) {
+        course.thumbnail = cat.image;
+      }
       const sub =
         cat.subCategories.find((s) => s.slug === updates.subCategorySlug) ||
         cat.subCategories[0];

@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { CategoryData, CourseData, CourseStatus } from "@/lib/types";
 import { CurriculumAndQuizManager } from "./CourseCreatorAndQuizBuilder";
+import { MediaUploadFields } from "./MediaUploadFields";
 
 interface Props {
   courses: CourseData[];
@@ -392,6 +393,8 @@ function CourseEditorView({
   const [title, setTitle] = useState(course.title);
   const [shortDescription, setShortDescription] = useState(course.shortDescription);
   const [description, setDescription] = useState(course.description);
+  const [thumbnail, setThumbnail] = useState(course.thumbnail);
+  const [introVideoUrl, setIntroVideoUrl] = useState(course.introVideoUrl || "");
   const [categorySlug, setCategorySlug] = useState(course.categorySlug);
   const [subCategorySlug, setSubCategorySlug] = useState(course.subCategorySlug);
   const [level, setLevel] = useState(course.level);
@@ -426,6 +429,8 @@ function CourseEditorView({
           title,
           shortDescription,
           description,
+          thumbnail,
+          introVideoUrl,
           categorySlug,
           subCategorySlug,
           level,
@@ -547,6 +552,13 @@ function CourseEditorView({
                   className="w-full rounded-xl border border-white/10 bg-[#050814] px-4 py-2.5 text-sm text-white"
                 />
               </div>
+
+              <MediaUploadFields
+                thumbnail={thumbnail}
+                onThumbnailChange={setThumbnail}
+                introVideoUrl={introVideoUrl}
+                onIntroVideoChange={setIntroVideoUrl}
+              />
 
               <div>
                 <label className="mb-1.5 block text-xs font-semibold text-slate-300">Category</label>
