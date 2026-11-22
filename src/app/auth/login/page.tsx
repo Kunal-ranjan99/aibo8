@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Bot, Lock, Mail, ShieldCheck, Sparkles, UserCheck } from "lucide-react";
+import { Bot, Lock, Mail, ShieldCheck, UserCheck } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -51,36 +51,6 @@ export default function LoginPage() {
           </div>
           <h1 className="mt-4 font-display text-2xl font-bold text-white">Welcome back to Aibo8</h1>
           <p className="mt-1 text-sm text-slate-400">Sign in to access your labs, courses & studio</p>
-        </div>
-
-        {/* 1-Click Demo Logins */}
-        <div className="mt-6 rounded-2xl border border-cyan-400/20 bg-cyan-500/[0.06] p-4">
-          <div className="mb-2.5 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-cyan-300">
-            <Sparkles className="h-3.5 w-3.5" /> 1-Click Instant Demo Access
-          </div>
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              type="button"
-              onClick={() => submitLogin("student@aibo8.ai", "student123")}
-              className="rounded-xl border border-white/10 bg-[#050814] py-2 text-xs font-semibold text-slate-200 transition hover:border-cyan-400/60 hover:text-cyan-300"
-            >
-              Student
-            </button>
-            <button
-              type="button"
-              onClick={() => submitLogin("elena@aibo8.ai", "instructor123")}
-              className="rounded-xl border border-white/10 bg-[#050814] py-2 text-xs font-semibold text-slate-200 transition hover:border-cyan-400/60 hover:text-cyan-300"
-            >
-              Instructor
-            </button>
-            <button
-              type="button"
-              onClick={() => submitLogin("admin@aibo8.ai", "admin123")}
-              className="rounded-xl border border-white/10 bg-[#050814] py-2 text-xs font-semibold text-slate-200 transition hover:border-cyan-400/60 hover:text-cyan-300"
-            >
-              Admin
-            </button>
-          </div>
         </div>
 
         <form

@@ -484,7 +484,7 @@ export default async function HomePage() {
                 className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white hover:bg-white/10"
               >
                 <ShieldCheck className="h-4 w-4 text-cyan-400" />
-                Try Demo Portals
+                Sign In to Portal
               </Link>
             </div>
           </div>

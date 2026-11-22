@@ -79,15 +79,15 @@ export function Footer() {
 
           <div>
             <h4 className="font-display text-sm font-semibold uppercase tracking-wider text-white">
-              Quick Demo Access
+              Contact &amp; Support
             </h4>
             <p className="mt-4 text-xs leading-relaxed text-slate-400">
-              Test every role immediately on the Sign In page with 1-click Demo Accounts:
+              Need help choosing an AI, Robotics, or IoT track for your school or college?
             </p>
-            <div className="mt-3 space-y-1.5 rounded-xl border border-white/10 bg-white/[0.03] p-3 font-mono-code text-xs text-slate-300">
-              <div>Student: student@aibo8.ai</div>
-              <div>Instructor: elena@aibo8.ai</div>
-              <div>Admin: admin@aibo8.ai</div>
+            <div className="mt-3 space-y-1.5 rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs text-slate-300">
+              <div>Support: support@aibo8.ai</div>
+              <div>Schools &amp; Colleges: edu@aibo8.ai</div>
+              <div>Mon – Sat • 9:00 AM – 7:00 PM IST</div>
             </div>
           </div>
         </div>
