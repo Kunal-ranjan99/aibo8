@@ -97,20 +97,22 @@ export function PaymentSettingsPanel({ initial }: { initial: PaymentGatewaySetti
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-semibold text-slate-300">Primary Currency</label>
+            <label className="mb-1 block text-xs font-semibold text-slate-300">
+              Default Currency Format (INR)
+            </label>
             <select
-              value={settings.currency}
+              value={settings.currencySymbol}
               onChange={(e) =>
                 setSettings((s) => ({
                   ...s,
-                  currency: e.target.value as "INR" | "USD",
-                  currencySymbol: e.target.value === "INR" ? "₹" : "$",
+                  currency: "INR",
+                  currencySymbol: e.target.value as "₹" | "INR ",
                 }))
               }
               className="w-full rounded-xl border border-white/10 bg-[#050814] px-3 py-2.5 text-sm text-white"
             >
-              <option value="INR">INR (₹ — Indian Rupee)</option>
-              <option value="USD">USD ($ — US Dollar)</option>
+              <option value="₹">₹ — Indian Rupee Symbol (Default)</option>
+              <option value="INR ">INR — Indian Rupee Prefix</option>
             </select>
           </div>
         </div>

@@ -679,6 +679,43 @@ export function updateUserRole(userId: string, role: Role) {
   return u;
 }
 
+export async function updateUserRecord(
+  userId: string,
+  updates: { name?: string; email?: string; role?: Role; newPassword?: string }
+) {
+  const passwordHash =
+    updates.newPassword && updates.newPassword.trim().length >= 6
+      ? await bcrypt.hash(updates.newPassword.trim(), 10)
+      : undefined;
+
+  if (hasDatabase && prisma) {
+    try {
+      await prisma.user.update({
+        where: { id: userId },
+        data: {
+          ...(updates.name?.trim() ? { name: updates.name.trim() } : {}),
+          ...(updates.email?.trim() ? { email: updates.email.trim().toLowerCase() } : {}),
+          ...(updates.role ? { role: updates.role } : {}),
+          ...(passwordHash ? { passwordHash } : {}),
+        },
+      });
+    } catch {
+      // fallback to memory store
+    }
+  }
+
+  const u = getMem().users.find((x) => x.id === userId);
+  if (!u) return null;
+  if (updates.name?.trim()) u.name = updates.name.trim();
+  if (updates.email?.trim()) u.email = updates.email.trim().toLowerCase();
+  if (updates.role) u.role = updates.role;
+  if (passwordHash && updates.newPassword) {
+    u.passwordPlain = updates.newPassword.trim();
+    u.passwordHash = passwordHash;
+  }
+  return { id: u.id, name: u.name, email: u.email, role: u.role };
+}
+
 export async function updateUserPassword(email: string, newPassword: string): Promise<boolean> {
   const normalized = email.trim().toLowerCase();
   const hash = await bcrypt.hash(newPassword, 10);

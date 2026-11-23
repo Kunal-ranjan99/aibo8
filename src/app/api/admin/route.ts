@@ -6,6 +6,7 @@ import {
   createSubCategory,
   enrollInCourse,
   updateCourseStatus,
+  updateUserRecord,
   updateUserRole,
 } from "@/lib/store";
 import { CourseStatus, Role } from "@/lib/types";
@@ -23,6 +24,24 @@ export async function POST(req: Request) {
     }
     if (body.action === "user_role") {
       const updated = updateUserRole(body.userId, body.role as Role);
+      return NextResponse.json({ user: updated });
+    }
+    if (body.action === "update_user") {
+      if (!body.userId) {
+        return NextResponse.json({ error: "userId is required." }, { status: 400 });
+      }
+      if (body.newPassword && String(body.newPassword).trim().length < 6) {
+        return NextResponse.json(
+          { error: "New password must be at least 6 characters." },
+          { status: 400 }
+        );
+      }
+      const updated = await updateUserRecord(body.userId, {
+        name: body.name,
+        email: body.email,
+        role: body.role as Role,
+        newPassword: body.newPassword,
+      });
       return NextResponse.json({ user: updated });
     }
     if (body.action === "create_coupon") {

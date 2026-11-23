@@ -142,6 +142,15 @@ export function AdminPanelClient({
   const [couponCode, setCouponCode] = useState("");
   const [couponDiscount, setCouponDiscount] = useState("25");
 
+  // Edit User & Password state
+  const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  const [editUserName, setEditUserName] = useState("");
+  const [editUserEmail, setEditUserEmail] = useState("");
+  const [editUserRole, setEditUserRole] = useState<Role>("STUDENT");
+  const [editUserPassword, setEditUserPassword] = useState("");
+  const [userSaveMsg, setUserSaveMsg] = useState("");
+  const [userSaveErr, setUserSaveErr] = useState("");
+
   const menuItems: { id: AdminTab; label: string; icon: React.ElementType; badge?: number }[] = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "courses", label: "Course Manager", icon: BookOpen, badge: stats.totalCourses },
@@ -165,6 +174,48 @@ export function AdminPanelClient({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "user_role", userId, role }),
     });
+    router.refresh();
+  }
+
+  function startEditUser(u: { id: string; name: string; email: string; role: Role }) {
+    setEditingUserId(u.id);
+    setEditUserName(u.name);
+    setEditUserEmail(u.email);
+    setEditUserRole(u.role);
+    setEditUserPassword("");
+    setUserSaveMsg("");
+    setUserSaveErr("");
+  }
+
+  async function saveUserEdit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editingUserId) return;
+    setUserSaveMsg("");
+    setUserSaveErr("");
+    const res = await fetch("/api/admin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "update_user",
+        userId: editingUserId,
+        name: editUserName,
+        email: editUserEmail,
+        role: editUserRole,
+        newPassword: editUserPassword || undefined,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setUserSaveErr(data.error || "Could not update user.");
+      return;
+    }
+    setUserSaveMsg(
+      editUserPassword
+        ? "User record & password updated!"
+        : "User record updated!"
+    );
+    setEditingUserId(null);
+    setEditUserPassword("");
     router.refresh();
   }
 
@@ -573,26 +624,119 @@ export function AdminPanelClient({
         {/* 9. RAZORPAY & PHONEPE PAYMENT SETTINGS */}
         {activeTab === "payments" && <PaymentSettingsPanel initial={paymentSettings} />}
 
-        {/* 10. USERS & ROLES */}
+        {/* 10. USERS & ROLES (Edit User Record + Reset Password) */}
         {activeTab === "users" && (
-          <div className="glass-card rounded-2xl p-6 divide-y divide-white/5">
-            {users.map((u) => (
-              <div key={u.id} className="flex items-center justify-between py-3.5">
-                <div>
-                  <div className="text-sm font-semibold text-white">{u.name}</div>
-                  <div className="text-xs text-slate-400">{u.email}</div>
-                </div>
-                <select
-                  value={u.role}
-                  onChange={(e) => changeRole(u.id, e.target.value as Role)}
-                  className="rounded-lg border border-white/10 bg-[#050814] px-3 py-1.5 text-xs font-semibold text-cyan-300"
-                >
-                  <option value="STUDENT">STUDENT</option>
-                  <option value="INSTRUCTOR">INSTRUCTOR</option>
-                  <option value="ADMIN">ADMIN</option>
-                </select>
+          <div className="space-y-4">
+            {userSaveMsg && (
+              <div className="rounded-xl border border-emerald-400/40 bg-emerald-500/15 px-4 py-2.5 text-xs font-semibold text-emerald-300">
+                {userSaveMsg}
               </div>
-            ))}
+            )}
+            {userSaveErr && (
+              <div className="rounded-xl border border-rose-400/40 bg-rose-500/15 px-4 py-2.5 text-xs font-semibold text-rose-300">
+                {userSaveErr}
+              </div>
+            )}
+
+            <div className="glass-card rounded-2xl p-6 divide-y divide-white/10">
+              {users.map((u) => {
+                const isEditing = editingUserId === u.id;
+                return (
+                  <div key={u.id} className="py-4 space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <div className="text-sm font-semibold text-white">{u.name}</div>
+                        <div className="text-xs text-slate-400">{u.email}</div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <select
+                          value={u.role}
+                          onChange={(e) => changeRole(u.id, e.target.value as Role)}
+                          className="rounded-lg border border-white/10 bg-[#050814] px-3 py-1.5 text-xs font-semibold text-cyan-300"
+                        >
+                          <option value="STUDENT">STUDENT</option>
+                          <option value="INSTRUCTOR">INSTRUCTOR</option>
+                          <option value="ADMIN">ADMIN</option>
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => (isEditing ? setEditingUserId(null) : startEditUser(u))}
+                          className="rounded-lg border border-cyan-400/40 bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-cyan-300 hover:bg-cyan-500/20"
+                        >
+                          {isEditing ? "Cancel" : "Edit / Password"}
+                        </button>
+                      </div>
+                    </div>
+
+                    {isEditing && (
+                      <form
+                        onSubmit={saveUserEdit}
+                        className="rounded-xl border border-cyan-400/25 bg-white/[0.03] p-4 space-y-3"
+                      >
+                        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                          <div>
+                            <label className="mb-1 block text-[11px] font-semibold text-slate-400">
+                              Full Name
+                            </label>
+                            <input
+                              required
+                              value={editUserName}
+                              onChange={(e) => setEditUserName(e.target.value)}
+                              className="w-full rounded-xl border border-white/10 bg-[#050814] px-3 py-2 text-xs text-white"
+                            />
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-[11px] font-semibold text-slate-400">
+                              Email Address
+                            </label>
+                            <input
+                              type="email"
+                              required
+                              value={editUserEmail}
+                              onChange={(e) => setEditUserEmail(e.target.value)}
+                              className="w-full rounded-xl border border-white/10 bg-[#050814] px-3 py-2 text-xs text-white"
+                            />
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-[11px] font-semibold text-slate-400">
+                              Role
+                            </label>
+                            <select
+                              value={editUserRole}
+                              onChange={(e) => setEditUserRole(e.target.value as Role)}
+                              className="w-full rounded-xl border border-white/10 bg-[#050814] px-3 py-2 text-xs text-white"
+                            >
+                              <option value="STUDENT">STUDENT</option>
+                              <option value="INSTRUCTOR">INSTRUCTOR</option>
+                              <option value="ADMIN">ADMIN</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-[11px] font-semibold text-amber-300">
+                              New Password (optional)
+                            </label>
+                            <input
+                              type="password"
+                              minLength={6}
+                              value={editUserPassword}
+                              onChange={(e) => setEditUserPassword(e.target.value)}
+                              placeholder="Min 6 chars to change"
+                              className="w-full rounded-xl border border-white/10 bg-[#050814] px-3 py-2 text-xs text-white"
+                            />
+                          </div>
+                        </div>
+                        <button
+                          type="submit"
+                          className="btn-cyber rounded-xl px-5 py-2 text-xs font-semibold text-white"
+                        >
+                          Save User &amp; Password
+                        </button>
+                      </form>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
