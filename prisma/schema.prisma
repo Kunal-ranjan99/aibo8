@@ -26,31 +26,70 @@ enum LessonType {
   QUIZ
 }
 
+enum PaymentGateway {
+  RAZORPAY
+  PHONEPE
+  FREE
+  DEMO
+}
+
+enum PayoutStatus {
+  PENDING
+  PAID
+  REJECTED
+}
+
+enum AssignmentStatus {
+  SUBMITTED
+  GRADED
+}
+
 model User {
-  id           String       @id @default(cuid())
+  id           String   @id @default(cuid())
   name         String
-  email        String       @unique
+  email        String   @unique
   passwordHash String
-  role         Role         @default(STUDENT)
+  role         Role     @default(STUDENT)
   avatar       String?
   bio          String?
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  xp           Int      @default(0)
+  streakDays   Int      @default(1)
+  referralCode String?  @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  courses      Course[]     @relation("InstructorCourses")
-  enrollments  Enrollment[]
-  reviews      Review[]
-  notes        LessonNote[]
-  certificates Certificate[]
+  courses          Course[]               @relation("InstructorCourses")
+  enrollments      Enrollment[]
+  reviews          Review[]
+  notes            LessonNote[]
+  certificates     Certificate[]
+  invoices         Invoice[]              @relation("BuyerInvoices")
+  payoutRequests   PayoutRequest[]
+  sentMessages     Message[]              @relation("SentMessages")
+  receivedMessages Message[]              @relation("ReceivedMessages")
+  questions        LessonQuestion[]
+  assignments      AssignmentSubmission[]
+  wishlist         Wishlist[]
+  notifications    Notification[]
 }
 
 model Category {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  description String?
-  icon        String?
-  courses     Course[]
+  id            String        @id @default(cuid())
+  name          String
+  slug          String        @unique
+  description   String?
+  icon          String?
+  subCategories SubCategory[]
+  courses       Course[]
+}
+
+model SubCategory {
+  id         String   @id @default(cuid())
+  name       String
+  slug       String   @unique
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  courses    Course[]
 }
 
 model Course {
@@ -60,28 +99,38 @@ model Course {
   shortDescription String
   description      String
   thumbnail        String
+  introVideoUrl    String?
   level            String       @default("Beginner")
+  ageGroup         String?
   price            Float        @default(0)
   discountPrice    Float?
   isFree           Boolean      @default(false)
   duration         String       @default("6h 30m")
   hardwareTags     String[]
+  hardwareBom      Json?
   outcomes         String[]
   requirements     String[]
-  status           CourseStatus @default(PUBLISHED)
+  status           CourseStatus @default(PENDING)
   featured         Boolean      @default(false)
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
 
-  categoryId   String
-  category     Category     @relation(fields: [categoryId], references: [id])
-  instructorId String
-  instructor   User         @relation("InstructorCourses", fields: [instructorId], references: [id])
+  categoryId    String
+  category      Category     @relation(fields: [categoryId], references: [id])
+  subCategoryId String?
+  subCategory   SubCategory? @relation(fields: [subCategoryId], references: [id])
+  instructorId  String
+  instructor    User         @relation("InstructorCourses", fields: [instructorId], references: [id])
 
-  sections     Section[]
-  enrollments  Enrollment[]
-  reviews      Review[]
-  certificates Certificate[]
+  sections      Section[]
+  enrollments   Enrollment[]
+  reviews       Review[]
+  certificates  Certificate[]
+  questions     LessonQuestion[]
+  assignments   AssignmentSubmission[]
+  wishlist      Wishlist[]
+  liveClasses   LiveClass[]
+  announcements Announcement[]
 }
 
 model Section {
@@ -94,20 +143,25 @@ model Section {
 }
 
 model Lesson {
-  id          String       @id @default(cuid())
-  title       String
-  type        LessonType   @default(VIDEO)
-  duration    String       @default("10m")
-  order       Int          @default(0)
-  isPreview   Boolean      @default(false)
-  videoUrl    String?
-  content     String?
-  codeSnippet String?
-  codeLang    String?
-  quizData    Json?
-  sectionId   String
-  section     Section      @relation(fields: [sectionId], references: [id], onDelete: Cascade)
-  notes       LessonNote[]
+  id               String     @id @default(cuid())
+  title            String
+  type             LessonType @default(VIDEO)
+  duration         String     @default("10m")
+  order            Int        @default(0)
+  isPreview        Boolean    @default(false)
+  videoUrl         String?
+  content          String?
+  codeSnippet      String?
+  codeLang         String?
+  quizData         Json?
+  passingScore     Int        @default(60)
+  timeLimitMinutes Int        @default(10)
+  maxAttempts      Int        @default(3)
+  sectionId        String
+  section          Section    @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  notes     LessonNote[]
+  questions LessonQuestion[]
 }
 
 model Enrollment {
@@ -162,10 +216,171 @@ model Certificate {
 }
 
 model Coupon {
-  id              String   @id @default(cuid())
-  code            String   @unique
+  id              String    @id @default(cuid())
+  code            String    @unique
   discountPercent Int
-  active          Boolean  @default(true)
+  active          Boolean   @default(true)
   expiresAt       DateTime?
+  createdAt       DateTime  @default(now())
+}
+
+model Bundle {
+  id           String   @id @default(cuid())
+  title        String
+  slug         String   @unique
+  tagline      String
+  ageGroup     String
+  courseIds    String[]
+  bundlePrice  Float
+  regularTotal Float
+  badge        String
+  thumbnail    String
+  createdAt    DateTime @default(now())
+}
+
+model PaymentGatewayConfig {
+  id                     String         @id @default("default")
+  activeGateway          PaymentGateway @default(RAZORPAY)
+  currency               String         @default("INR")
+  currencySymbol         String         @default("₹")
+  adminCommissionPercent Int            @default(20)
+  razorpayConfig         Json?
+  phonepeConfig          Json?
+  smtpConfig             Json?
+  updatedAt              DateTime       @updatedAt
+}
+
+model Invoice {
+  id              String         @id @default(cuid())
+  invoiceNumber   String         @unique
+  userId          String
+  itemType        String
+  itemId          String
+  itemTitle       String
+  instructorId    String
+  gateway         PaymentGateway
+  transactionId   String
+  subtotal        Float
+  discount        Float          @default(0)
+  taxAmount       Float          @default(0)
+  totalPaid       Float
+  adminShare      Float
+  instructorShare Float
+  currencySymbol  String         @default("₹")
+  createdAt       DateTime       @default(now())
+
+  user User @relation("BuyerInvoices", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PayoutRequest {
+  id             String       @id @default(cuid())
+  instructorId   String
+  amount         Float
+  method         String
+  accountDetails String
+  status         PayoutStatus @default(PENDING)
+  createdAt      DateTime     @default(now())
+  paidAt         DateTime?
+
+  instructor User @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  senderId   String
+  receiverId String
+  body       String
+  createdAt  DateTime @default(now())
+
+  sender   User @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+}
+
+model LessonQuestion {
+  id        String   @id @default(cuid())
+  lessonId  String
+  courseId  String
+  userId    String
+  question  String
+  replies   Json     @default("[]")
+  createdAt DateTime @default(now())
+
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AssignmentSubmission {
+  id           String           @id @default(cuid())
+  courseId     String
+  userId       String
+  projectTitle String
+  repoUrl      String?
+  schematicUrl String?
+  notes        String?
+  status       AssignmentStatus @default(SUBMITTED)
+  grade        Int?
+  feedback     String?
+  submittedAt  DateTime         @default(now())
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Wishlist {
+  id       String @id @default(cuid())
+  userId   String
+  courseId String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+model LiveClass {
+  id          String   @id @default(cuid())
+  courseId    String?
+  title       String
+  hostName    String
+  platform    String   @default("Zoom")
+  meetingUrl  String
+  scheduledAt DateTime
+  durationMin Int      @default(60)
+  createdAt   DateTime @default(now())
+
+  course Course? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  courseId  String?
+  title     String
+  body      String
+  author    String
+  createdAt DateTime @default(now())
+
+  course Course? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  body      String
+  read      Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model InstitutionBatch {
+  id              String   @id @default(cuid())
+  institutionName String
+  batchCode       String   @unique
+  courseId        String
+  maxSeats        Int      @default(50)
+  usedSeats       Int      @default(0)
   createdAt       DateTime @default(now())
 }

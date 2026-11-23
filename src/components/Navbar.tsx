@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Bot, Cpu, LayoutDashboard, LogOut, Menu, Search, Sparkles, X } from "lucide-react";
 import { UserSession } from "@/lib/types";
 import { ThemeToggle } from "./ThemeToggle";
+import { NotificationBell } from "./NotificationBell";
 
 export function Navbar({ user }: { user: UserSession | null }) {
   const pathname = usePathname();
@@ -36,7 +37,8 @@ export function Navbar({ user }: { user: UserSession | null }) {
   const navLinks = [
     { href: "/courses", label: "Courses" },
     { href: "/bundles", label: "Bundles" },
-    { href: "/compare", label: "Compare" },
+    { href: "/community", label: "Live & XP" },
+    { href: "/verify", label: "Verify" },
     ...(user ? [{ href: "/messages", label: "Inbox" }] : []),
   ];
 
@@ -94,6 +96,7 @@ export function Navbar({ user }: { user: UserSession | null }) {
           </form>
 
           <ThemeToggle />
+          {user && <NotificationBell />}
 
           {user ? (
             <div className="flex shrink-0 items-center gap-2">
@@ -134,6 +137,7 @@ export function Navbar({ user }: { user: UserSession | null }) {
         {/* Mobile menu toggle */}
         <div className="flex items-center gap-2 md:hidden">
           <ThemeToggle />
+          {user && <NotificationBell />}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-200"
@@ -171,6 +175,7 @@ export function Navbar({ user }: { user: UserSession | null }) {
           </div>
           <div className="mt-4 flex flex-col gap-2 border-t border-white/10 pt-4">
             <ThemeToggle />
+          {user && <NotificationBell />}
 
           {user ? (
               <>

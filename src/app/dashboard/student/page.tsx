@@ -1,9 +1,24 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Award, BookOpen, CheckCircle2, FileText, Heart, MessageSquare, PlayCircle, Sparkles } from "lucide-react";
+import {
+  Award,
+  BookOpen,
+  CheckCircle2,
+  FileText,
+  Flame,
+  Gift,
+  Heart,
+  MessageSquare,
+  PlayCircle,
+  ShieldCheck,
+  Sparkles,
+  Trophy,
+} from "lucide-react";
 import { getSession } from "@/lib/auth";
 import { getAllCourses, getUserCertificates, getUserEnrollments } from "@/lib/store";
 import { getUserInvoices, getUserWishlist } from "@/lib/lms-extras";
+import { getGamificationForUser } from "@/lib/v3-features";
+import { BatchRedeemBox } from "@/components/BatchRedeemBox";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +35,7 @@ export default async function StudentDashboardPage() {
   const invoices = getUserInvoices(user.id);
   const wishlistIds = getUserWishlist(user.id);
   const wishlistCourses = courses.filter((c) => wishlistIds.includes(c.id));
+  const gamification = getGamificationForUser(user.id, user.name);
 
   const enrolledItems = enrollments
     .map((e) => ({
@@ -95,6 +111,62 @@ export default async function StudentDashboardPage() {
           <div className="mt-2 font-display text-3xl font-bold text-white">{wishlistCourses.length}</div>
         </div>
       </div>
+
+      {/* Gamification XP, Streak, Badges + Parent Portal & Referral */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="glass-card rounded-2xl p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-1.5 text-xs font-bold uppercase text-amber-400">
+              <Trophy className="h-4 w-4" /> {gamification.level}
+            </span>
+            <span className="flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-0.5 text-xs font-bold text-amber-300">
+              <Flame className="h-3.5 w-3.5" /> {gamification.streakDays}d Streak
+            </span>
+          </div>
+          <div className="font-display text-3xl font-bold text-cyan-300">{gamification.xp} XP</div>
+          <div className="flex flex-wrap gap-1.5">
+            {gamification.badges.map((b) => (
+              <span key={b} className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-cyan-200">
+                ★ {b}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="glass-card rounded-2xl p-5 space-y-3">
+          <div className="flex items-center gap-1.5 text-xs font-bold uppercase text-emerald-400">
+            <ShieldCheck className="h-4 w-4" /> Parent / Guardian View
+          </div>
+          <p className="text-xs text-slate-400">
+            Share this read-only progress link with your parents or teachers so they can track your courses, exams &amp; certificates.
+          </p>
+          <Link
+            href={`/parent/${user.id}`}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-400/40 bg-emerald-500/10 px-4 py-2 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/20"
+          >
+            Open Parent Progress Report →
+          </Link>
+        </div>
+
+        <div className="glass-card rounded-2xl p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-1.5 text-xs font-bold uppercase text-indigo-300">
+              <Gift className="h-4 w-4" /> Refer &amp; Earn ₹200
+            </span>
+            <span className="text-xs font-bold text-emerald-400">
+              ₹{gamification.referralCreditsInr} Earned
+            </span>
+          </div>
+          <p className="text-xs text-slate-400">
+            Invite school/college friends with your code ({gamification.referralsCount} friends joined):
+          </p>
+          <div className="rounded-xl border border-indigo-400/30 bg-[#050814] px-3.5 py-2 font-mono-code text-sm font-bold text-cyan-300">
+            {gamification.referralCode}
+          </div>
+        </div>
+      </div>
+
+      <BatchRedeemBox isLoggedIn={true} />
 
       {/* Enrolled Courses */}
       <section className="space-y-4">

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import crypto from "crypto";
 import { getSession } from "@/lib/auth";
 import { enrollInCourse, getAllCourses, getCoupons } from "@/lib/store";
 import {
@@ -48,6 +49,29 @@ export async function POST(req: Request) {
     }
     const updated = updatePaymentSettings(body.settings);
     return NextResponse.json({ settings: updated });
+  }
+
+  // Verify live Razorpay HMAC-SHA256 signature or PhonePe SHA-256 checksum
+  if (body.action === "verify_signature") {
+    const settings = getPaymentSettings();
+    if (body.gateway === "RAZORPAY" && settings.razorpay.keySecret) {
+      const expected = crypto
+        .createHmac("sha256", settings.razorpay.keySecret)
+        .update(`${body.orderId}|${body.paymentId}`)
+        .digest("hex");
+      return NextResponse.json({ verified: expected === body.signature });
+    }
+    if (body.gateway === "PHONEPE" && settings.phonepe.saltKey) {
+      const expected =
+        crypto
+          .createHash("sha256")
+          .update(`${body.payload}/pg/v1/pay${settings.phonepe.saltKey}`)
+          .digest("hex") +
+        "###" +
+        settings.phonepe.saltIndex;
+      return NextResponse.json({ verified: expected === body.checksum });
+    }
+    return NextResponse.json({ verified: true, mode: "sandbox" });
   }
 
   // Checkout for Course or Bundle (Razorpay / PhonePe / Free)

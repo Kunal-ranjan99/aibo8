@@ -14,10 +14,12 @@ import {
   LayoutDashboard,
   Plus,
   PlusCircle,
+  School,
   Settings,
   Ticket,
   UserPlus,
   Users,
+  Video,
   Wallet,
 } from "lucide-react";
 import {
@@ -30,6 +32,12 @@ import {
   PayoutRequestData,
   Role,
 } from "@/lib/types";
+import {
+  AnnouncementItem,
+  InstitutionBatchItem,
+  LiveClassItem,
+  SmtpSettings,
+} from "@/lib/v3-features";
 import { CreateCourseForm, CurriculumAndQuizManager } from "./CourseCreatorAndQuizBuilder";
 import { CourseManager } from "./CourseManager";
 import {
@@ -37,6 +45,11 @@ import {
   PaymentSettingsPanel,
   PayoutsAndSalesAdminPanel,
 } from "./AdminPaymentAndPayouts";
+import {
+  InstitutionalBatchesAdmin,
+  LiveAndAnnouncementsAdmin,
+  SmtpSettingsAdmin,
+} from "./AdminV3Panels";
 import { ThemeToggle } from "./ThemeToggle";
 
 type AdminTab =
@@ -47,6 +60,8 @@ type AdminTab =
   | "categories"
   | "students"
   | "assignments"
+  | "live"
+  | "batches"
   | "payouts"
   | "payments"
   | "users"
@@ -71,6 +86,10 @@ interface Props {
   invoices: InvoiceData[];
   payouts: PayoutRequestData[];
   assignments: AssignmentSubmissionData[];
+  liveClasses: LiveClassItem[];
+  announcements: AnnouncementItem[];
+  batches: InstitutionBatchItem[];
+  smtp: SmtpSettings;
   stats: {
     totalCourses: number;
     publishedCourses: number;
@@ -97,6 +116,10 @@ export function AdminPanelClient({
   invoices,
   payouts,
   assignments,
+  liveClasses,
+  announcements,
+  batches,
+  smtp,
   stats,
 }: Props) {
   const router = useRouter();
@@ -127,6 +150,8 @@ export function AdminPanelClient({
     { id: "categories", label: "Categories & Sub-Cat", icon: FolderTree },
     { id: "students", label: "Student Enrollment", icon: GraduationCap },
     { id: "assignments", label: "Project Grading", icon: FolderGit2, badge: assignments.length },
+    { id: "live", label: "Live & Notices", icon: Video },
+    { id: "batches", label: "School / College B2B", icon: School },
     { id: "payouts", label: "Payouts & Sales", icon: Wallet },
     { id: "payments", label: "Razorpay / PhonePe", icon: CreditCard },
     { id: "users", label: "Users & Roles", icon: Users },
@@ -526,6 +551,20 @@ export function AdminPanelClient({
         {/* 7. PROJECT ASSIGNMENTS GRADING */}
         {activeTab === "assignments" && <AssignmentGradingPanel assignments={assignments} />}
 
+        {/* 7B. LIVE CLASSES & ANNOUNCEMENTS */}
+        {activeTab === "live" && (
+          <LiveAndAnnouncementsAdmin
+            courses={courses}
+            liveClasses={liveClasses}
+            announcements={announcements}
+          />
+        )}
+
+        {/* 7C. SCHOOL & COLLEGE BULK BATCHES */}
+        {activeTab === "batches" && (
+          <InstitutionalBatchesAdmin courses={courses} batches={batches} />
+        )}
+
         {/* 8. PAYOUTS & SALES */}
         {activeTab === "payouts" && (
           <PayoutsAndSalesAdminPanel invoices={invoices} payouts={payouts} />
@@ -597,25 +636,30 @@ export function AdminPanelClient({
 
         {/* 9. SYSTEM SETTINGS */}
         {activeTab === "settings" && (
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="glass-card rounded-2xl p-6 space-y-3">
-              <h3 className="flex items-center gap-2 font-display text-base font-bold text-white">
-                <Database className="h-4 w-4 text-cyan-400" /> Database & Deployment Mode
-              </h3>
-              <p className="text-sm text-slate-300">{stats.databaseMode}</p>
-              <p className="text-xs text-slate-400">
-                Ready for AWS EC2 + PostgreSQL via Prisma (`deploy/setup-ec2.sh`).
-              </p>
+          <div className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="glass-card rounded-2xl p-6 space-y-3">
+                <h3 className="flex items-center gap-2 font-display text-base font-bold text-white">
+                  <Database className="h-4 w-4 text-cyan-400" /> Database &amp; Deployment Mode
+                </h3>
+                <p className="text-sm text-slate-300">{stats.databaseMode}</p>
+                <p className="text-xs text-slate-400">
+                  Full 20+ table PostgreSQL schema ready in prisma/schema.prisma for AWS EC2.
+                </p>
+              </div>
+              <div className="glass-card rounded-2xl p-6 space-y-3">
+                <h3 className="flex items-center gap-2 font-display text-base font-bold text-white">
+                  <CreditCard className="h-4 w-4 text-emerald-400" /> Active Payment Gateway
+                </h3>
+                <p className="text-sm text-slate-300">
+                  Active Frontend Method: <strong>{paymentSettings.activeGateway}</strong>
+                </p>
+                <p className="text-xs text-slate-400">
+                  Switch between Razorpay &amp; PhonePe anytime in the Razorpay / PhonePe tab.
+                </p>
+              </div>
             </div>
-            <div className="glass-card rounded-2xl p-6 space-y-3">
-              <h3 className="flex items-center gap-2 font-display text-base font-bold text-white">
-                <CreditCard className="h-4 w-4 text-emerald-400" /> Payment Gateways
-              </h3>
-              <p className="text-sm text-slate-300">Free Enrollment + Demo Checkout Active</p>
-              <p className="text-xs text-slate-400">
-                Stripe & Razorpay environment slots are pre-configured in `.env.example`.
-              </p>
-            </div>
+            <SmtpSettingsAdmin initial={smtp} />
           </div>
         )}
       </div>

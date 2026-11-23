@@ -14,6 +14,12 @@ import {
   getAllPayouts,
   getPaymentSettings,
 } from "@/lib/lms-extras";
+import {
+  getAnnouncements,
+  getInstitutionBatches,
+  getLiveClasses,
+  getSmtpSettings,
+} from "@/lib/v3-features";
 import { AdminPanelClient } from "@/components/AdminPanelClient";
 
 export const dynamic = "force-dynamic";
@@ -33,6 +39,10 @@ export default async function AdminDashboardPage() {
   const invoices = getAllInvoices();
   const payouts = getAllPayouts();
   const assignments = getAllAssignments();
+  const liveClasses = getLiveClasses();
+  const announcements = getAnnouncements();
+  const batches = getInstitutionBatches();
+  const smtp = getSmtpSettings();
 
   return (
     <AdminPanelClient
@@ -47,6 +57,10 @@ export default async function AdminDashboardPage() {
       invoices={invoices}
       payouts={payouts}
       assignments={assignments}
+      liveClasses={liveClasses}
+      announcements={announcements}
+      batches={batches}
+      smtp={smtp}
     />
   );
 }

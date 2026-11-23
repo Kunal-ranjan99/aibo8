@@ -29,6 +29,7 @@ import {
   LessonQuestionData,
   NoteData,
 } from "@/lib/types";
+import { CourseExtrasTabs } from "./CourseExtrasTabs";
 
 interface Props {
   course: CourseData;
@@ -742,6 +743,13 @@ export function CoursePlayerClient({
               </div>
             )}
           </div>
+
+          {/* AI Study Buddy, Hardware Kit BOM & Live Classes */}
+          <CourseExtrasTabs
+            courseId={course.id}
+            courseTitle={course.title}
+            isLoggedIn={isLoggedIn}
+          />
         </div>
 
         {/* Right Curriculum Sidebar */}

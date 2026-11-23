@@ -50,6 +50,14 @@
         "nxtPslug": "nxtPslug"
       },
       "namedRegex": "^/learn/(?<nxtPslug>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/parent/[id]",
+      "regex": "^/parent/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/parent/(?<nxtPid>[^/]+?)(?:/)?$"
     }
   ],
   "staticRoutes": [
@@ -64,6 +72,12 @@
       "regex": "^/_not\\-found(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/auth/forgot-password",
+      "regex": "^/auth/forgot\\-password(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/auth/forgot\\-password(?:/)?$"
     },
     {
       "page": "/auth/login",
@@ -82,6 +96,12 @@
       "regex": "^/bundles(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/bundles(?:/)?$"
+    },
+    {
+      "page": "/community",
+      "regex": "^/community(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/community(?:/)?$"
     },
     {
       "page": "/compare",
@@ -118,6 +138,12 @@
       "regex": "^/messages(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/messages(?:/)?$"
+    },
+    {
+      "page": "/verify",
+      "regex": "^/verify(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/verify(?:/)?$"
     }
   ],
   "dataRoutes": [],

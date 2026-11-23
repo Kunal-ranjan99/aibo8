@@ -679,6 +679,27 @@ export function updateUserRole(userId: string, role: Role) {
   return u;
 }
 
+export async function updateUserPassword(email: string, newPassword: string): Promise<boolean> {
+  const normalized = email.trim().toLowerCase();
+  const hash = await bcrypt.hash(newPassword, 10);
+  if (hasDatabase && prisma) {
+    try {
+      await prisma.user.update({
+        where: { email: normalized },
+        data: { passwordHash: hash },
+      });
+      return true;
+    } catch {
+      // fallback to memory store
+    }
+  }
+  const u = getMem().users.find((x) => x.email.toLowerCase() === normalized);
+  if (!u) return false;
+  u.passwordPlain = newPassword;
+  u.passwordHash = hash;
+  return true;
+}
+
 export function getPlatformStats() {
   const mem = getMem();
   const totalStudents = mem.courses.reduce((a, c) => a + c.studentsCount, 0);
