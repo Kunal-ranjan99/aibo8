@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { getSession } from "@/lib/auth";
-import { enrollInCourse, getAllCourses, getCoupons } from "@/lib/store";
+import { enrollInCourse, getAllCourses, validateCouponCode } from "@/lib/store";
 import {
   createInvoice,
   getBundleById,
@@ -77,18 +77,14 @@ export async function POST(req: Request) {
   // Checkout for Course or Bundle (Razorpay / PhonePe / Free)
   if (body.action === "checkout") {
     const gateway = (body.gateway || "RAZORPAY") as "RAZORPAY" | "PHONEPE" | "FREE" | "DEMO";
-    let discountPct = 0;
-    if (body.couponCode) {
-      const coupon = getCoupons().find(
-        (c) => c.active && c.code.toUpperCase() === String(body.couponCode).trim().toUpperCase()
-      );
-      if (coupon) discountPct = coupon.discountPercent;
-    }
 
     if (body.itemType === "BUNDLE") {
       const bundle = getBundleById(body.itemId);
       if (!bundle) return NextResponse.json({ error: "Bundle not found." }, { status: 404 });
-      const discount = Math.round((bundle.bundlePrice * discountPct) / 100);
+      const couponCheck = body.couponCode
+        ? validateCouponCode(String(body.couponCode), bundle.bundlePrice)
+        : { valid: false, discountAmount: 0 };
+      const discount = couponCheck.valid ? couponCheck.discountAmount : 0;
       for (const cid of bundle.courseIds) {
         await enrollInCourse(user.id, cid);
       }
@@ -110,7 +106,11 @@ export async function POST(req: Request) {
     if (!course) return NextResponse.json({ error: "Course not found." }, { status: 404 });
 
     const basePrice = course.isFree ? 0 : (course.discountPrice ?? course.price);
-    const discount = Math.round((basePrice * discountPct) / 100);
+    const couponCheck =
+      !course.isFree && body.couponCode
+        ? validateCouponCode(String(body.couponCode), basePrice)
+        : { valid: false, discountAmount: 0 };
+    const discount = couponCheck.valid ? couponCheck.discountAmount : 0;
     await enrollInCourse(user.id, course.id);
     const invoice = createInvoice({
       user,
@@ -118,7 +118,7 @@ export async function POST(req: Request) {
       itemId: course.id,
       itemTitle: course.title,
       instructorId: course.instructorId,
-      gateway: basePrice === 0 ? "FREE" : gateway,
+      gateway: basePrice - discount <= 0 ? "FREE" : gateway,
       subtotal: basePrice,
       discount,
     });

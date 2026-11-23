@@ -4,7 +4,9 @@ import {
   addCoupon,
   createCategory,
   createSubCategory,
+  deleteCoupon,
   enrollInCourse,
+  updateCoupon,
   updateCourseStatus,
   updateUserRecord,
   updateUserRole,
@@ -45,8 +47,28 @@ export async function POST(req: Request) {
       return NextResponse.json({ user: updated });
     }
     if (body.action === "create_coupon") {
-      const coupon = addCoupon(body.code, Number(body.discountPercent) || 15);
+      const coupon = addCoupon({
+        code: body.code,
+        discountType: body.discountType === "FLAT" ? "FLAT" : "PERCENT",
+        discountValue: Number(body.discountValue ?? body.discountPercent) || 15,
+        active: body.active !== undefined ? Boolean(body.active) : true,
+        expiresAt: body.expiresAt || null,
+      });
       return NextResponse.json({ coupon });
+    }
+    if (body.action === "update_coupon") {
+      const coupon = updateCoupon(body.couponId, {
+        code: body.code,
+        discountType: body.discountType,
+        discountValue: body.discountValue !== undefined ? Number(body.discountValue) : undefined,
+        active: body.active,
+        expiresAt: body.expiresAt,
+      });
+      return NextResponse.json({ coupon });
+    }
+    if (body.action === "delete_coupon") {
+      deleteCoupon(body.couponId);
+      return NextResponse.json({ ok: true });
     }
     if (body.action === "create_category") {
       const category = createCategory(body.name, body.description || "");

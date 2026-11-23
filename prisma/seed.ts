@@ -93,8 +93,11 @@ async function main() {
       update: {},
       create: {
         code: cp.code,
+        discountType: cp.discountType,
+        discountValue: cp.discountValue,
         discountPercent: cp.discountPercent,
         active: cp.active,
+        expiresAt: cp.expiresAt ? new Date(`${cp.expiresAt}T23:59:59Z`) : null,
       },
     });
   }

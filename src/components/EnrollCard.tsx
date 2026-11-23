@@ -37,22 +37,22 @@ export function EnrollCard({
   const gatewayLabel = activeGateway === "PHONEPE" ? "PhonePe UPI" : "Razorpay";
 
   const basePrice = course.discountPrice ?? course.price;
-  const finalPrice = course.isFree ? 0 : Math.max(0, Math.round(basePrice * (1 - discount / 100)));
+  const finalPrice = course.isFree ? 0 : Math.max(0, basePrice - discount);
 
-  function applyCoupon() {
-    const code = coupon.trim().toUpperCase();
-    if (code === "AIBO20") {
-      setDiscount(20);
-      setCouponMsg("20% off applied (AIBO20)");
-    } else if (code === "ROBOTICS50") {
-      setDiscount(50);
-      setCouponMsg("50% off applied (ROBOTICS50)");
-    } else if (code === "LAUNCH100") {
-      setDiscount(100);
-      setCouponMsg("100% launch grant applied!");
+  async function applyCoupon() {
+    if (!coupon.trim()) return;
+    const res = await fetch("/api/coupons/validate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: coupon.trim(), amount: basePrice }),
+    });
+    const data = await res.json();
+    if (data.valid) {
+      setDiscount(data.discountAmount || 0);
+      setCouponMsg(data.message);
     } else {
       setDiscount(0);
-      setCouponMsg("Try AIBO20, ROBOTICS50, or LAUNCH100");
+      setCouponMsg(data.message || "Invalid or expired coupon.");
     }
   }
 

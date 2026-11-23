@@ -653,15 +653,97 @@ export function getCoupons(): CouponData[] {
   return getMem().coupons;
 }
 
-export function addCoupon(code: string, discountPercent: number): CouponData {
+export function addCoupon(input: {
+  code: string;
+  discountType: "PERCENT" | "FLAT";
+  discountValue: number;
+  active?: boolean;
+  expiresAt?: string | null;
+}): CouponData {
+  const val = Math.max(1, Number(input.discountValue) || 10);
   const coupon: CouponData = {
     id: `coup-${Date.now()}`,
-    code: code.trim().toUpperCase(),
-    discountPercent,
-    active: true,
+    code: input.code.trim().toUpperCase(),
+    discountType: input.discountType === "FLAT" ? "FLAT" : "PERCENT",
+    discountValue: input.discountType === "PERCENT" ? Math.min(100, val) : val,
+    discountPercent: input.discountType === "PERCENT" ? Math.min(100, val) : 0,
+    active: input.active !== undefined ? Boolean(input.active) : true,
+    expiresAt: input.expiresAt?.trim() || null,
   };
   getMem().coupons.unshift(coupon);
   return coupon;
+}
+
+export function updateCoupon(
+  id: string,
+  updates: {
+    code?: string;
+    discountType?: "PERCENT" | "FLAT";
+    discountValue?: number;
+    active?: boolean;
+    expiresAt?: string | null;
+  }
+): CouponData | null {
+  const c = getMem().coupons.find((x) => x.id === id);
+  if (!c) return null;
+  if (updates.code?.trim()) c.code = updates.code.trim().toUpperCase();
+  if (updates.discountType) c.discountType = updates.discountType === "FLAT" ? "FLAT" : "PERCENT";
+  if (updates.discountValue !== undefined) {
+    const val = Math.max(1, Number(updates.discountValue) || 1);
+    c.discountValue = c.discountType === "PERCENT" ? Math.min(100, val) : val;
+    c.discountPercent = c.discountType === "PERCENT" ? c.discountValue : 0;
+  }
+  if (updates.active !== undefined) c.active = Boolean(updates.active);
+  if (updates.expiresAt !== undefined) c.expiresAt = updates.expiresAt?.trim() || null;
+  return c;
+}
+
+export function deleteCoupon(id: string): boolean {
+  const mem = getMem();
+  const idx = mem.coupons.findIndex((x) => x.id === id);
+  if (idx === -1) return false;
+  mem.coupons.splice(idx, 1);
+  return true;
+}
+
+export function validateCouponCode(
+  rawCode: string,
+  baseAmount: number
+): { valid: boolean; coupon?: CouponData; discountAmount: number; message: string } {
+  const code = rawCode.trim().toUpperCase();
+  const coupon = getMem().coupons.find((c) => c.code.toUpperCase() === code);
+  if (!coupon) {
+    return { valid: false, discountAmount: 0, message: "Invalid coupon code." };
+  }
+  if (!coupon.active) {
+    return { valid: false, discountAmount: 0, message: "This coupon is currently inactive." };
+  }
+  if (coupon.expiresAt) {
+    const endOfDay = new Date(`${coupon.expiresAt}T23:59:59`);
+    if (!Number.isNaN(endOfDay.getTime()) && endOfDay.getTime() < Date.now()) {
+      return {
+        valid: false,
+        discountAmount: 0,
+        message: `Coupon expired on ${coupon.expiresAt}.`,
+      };
+    }
+  }
+  const discountAmount =
+    coupon.discountType === "FLAT"
+      ? Math.min(baseAmount, Math.round(coupon.discountValue))
+      : Math.round((baseAmount * Math.min(100, coupon.discountValue)) / 100);
+
+  const label =
+    coupon.discountType === "FLAT"
+      ? `₹${coupon.discountValue} flat off`
+      : `${coupon.discountValue}% off`;
+
+  return {
+    valid: true,
+    coupon,
+    discountAmount,
+    message: `${label} applied (${coupon.code})`,
+  };
 }
 
 export function getAllUsersForAdmin() {

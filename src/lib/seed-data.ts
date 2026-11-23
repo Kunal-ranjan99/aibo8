@@ -679,9 +679,33 @@ results = trt_model.predict(source=0, show=True, conf=0.45)`,
 ];
 
 export const SEED_COUPONS: CouponData[] = [
-  { id: "coup-1", code: "AIBO20", discountPercent: 20, active: true },
-  { id: "coup-2", code: "ROBOTICS50", discountPercent: 50, active: true },
-  { id: "coup-3", code: "LAUNCH100", discountPercent: 100, active: true },
+  {
+    id: "coup-1",
+    code: "AIBO20",
+    discountType: "PERCENT",
+    discountValue: 20,
+    discountPercent: 20,
+    active: true,
+    expiresAt: "2027-03-31",
+  },
+  {
+    id: "coup-2",
+    code: "FLAT500",
+    discountType: "FLAT",
+    discountValue: 500,
+    discountPercent: 0,
+    active: true,
+    expiresAt: "2027-03-31",
+  },
+  {
+    id: "coup-3",
+    code: "ROBOTICS50",
+    discountType: "PERCENT",
+    discountValue: 50,
+    discountPercent: 50,
+    active: true,
+    expiresAt: "2027-01-31",
+  },
 ];
 
 export const SEED_ENROLLMENTS: EnrollmentData[] = [

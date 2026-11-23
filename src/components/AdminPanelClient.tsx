@@ -50,6 +50,7 @@ import {
   LiveAndAnnouncementsAdmin,
   SmtpSettingsAdmin,
 } from "./AdminV3Panels";
+import { CouponManagerAdmin } from "./CouponManagerAdmin";
 import { ThemeToggle } from "./ThemeToggle";
 
 type AdminTab =
@@ -137,10 +138,6 @@ export function AdminPanelClient({
   );
   const [enrollCourseId, setEnrollCourseId] = useState(courses[0]?.id || "");
   const [enrollMsg, setEnrollMsg] = useState("");
-
-  // Coupon state
-  const [couponCode, setCouponCode] = useState("");
-  const [couponDiscount, setCouponDiscount] = useState("25");
 
   // Edit User & Password state
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
@@ -260,22 +257,6 @@ export function AdminPanelClient({
       setEnrollMsg("Student enrolled in course!");
       router.refresh();
     }
-  }
-
-  async function handleAddCoupon(e: React.FormEvent) {
-    e.preventDefault();
-    if (!couponCode.trim()) return;
-    await fetch("/api/admin", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "create_coupon",
-        code: couponCode,
-        discountPercent: Number(couponDiscount),
-      }),
-    });
-    setCouponCode("");
-    router.refresh();
   }
 
   const monthlyRevenueBars = [
@@ -741,42 +722,7 @@ export function AdminPanelClient({
         )}
 
         {/* 8. COUPONS */}
-        {activeTab === "coupons" && (
-          <div className="glass-card rounded-2xl p-6 space-y-5">
-            <form onSubmit={handleAddCoupon} className="flex flex-wrap gap-3">
-              <input
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value)}
-                placeholder="COUPON CODE (e.g. AIBO30)"
-                className="flex-1 min-w-[200px] rounded-xl border border-white/10 bg-[#050814] px-4 py-2.5 text-xs uppercase text-white"
-              />
-              <input
-                type="number"
-                min={5}
-                max={100}
-                value={couponDiscount}
-                onChange={(e) => setCouponDiscount(e.target.value)}
-                className="w-28 rounded-xl border border-white/10 bg-[#050814] px-3 py-2.5 text-xs text-white"
-              />
-              <button type="submit" className="btn-cyber rounded-xl px-5 py-2.5 text-xs font-semibold text-white">
-                + Create Coupon
-              </button>
-            </form>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {coupons.map((cp) => (
-                <div
-                  key={cp.id}
-                  className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3"
-                >
-                  <span className="font-mono-code text-sm font-bold text-cyan-300">{cp.code}</span>
-                  <span className="rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-semibold text-emerald-400">
-                    {cp.discountPercent}% OFF
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {activeTab === "coupons" && <CouponManagerAdmin coupons={coupons} />}
 
         {/* 9. SYSTEM SETTINGS */}
         {activeTab === "settings" && (

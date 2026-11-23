@@ -218,7 +218,9 @@ model Certificate {
 model Coupon {
   id              String    @id @default(cuid())
   code            String    @unique
-  discountPercent Int
+  discountType    String    @default("PERCENT")
+  discountValue   Float     @default(10)
+  discountPercent Int       @default(10)
   active          Boolean   @default(true)
   expiresAt       DateTime?
   createdAt       DateTime  @default(now())

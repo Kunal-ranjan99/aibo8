@@ -157,8 +157,11 @@ export interface CertificateData {
 export interface CouponData {
   id: string;
   code: string;
+  discountType: "PERCENT" | "FLAT";
+  discountValue: number;
   discountPercent: number;
   active: boolean;
+  expiresAt?: string | null;
 }
 
 export interface PaymentGatewaySettings {
